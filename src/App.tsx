@@ -5,7 +5,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import "./App.css";
-import ButtonShowcase from "./components/ui/button.stories";
 
 const queryClient = new QueryClient();
 
@@ -17,7 +16,6 @@ const App = () => (
         <Routes>
           <Route path="/specai-page/Index" element={<Index />} />
           <Route path="/specai-page/NotFound" element={<NotFound />} />
-          <Route path="/specai-component/button" element={<ButtonShowcase />} />
 
           <Route path="/" element={<Index data-dora-id="1" />} />
           {/* Place all custom routes above the catch-all "*" route */}

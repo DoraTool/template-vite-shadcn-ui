@@ -55,8 +55,6 @@ function componentSpecTree() {
                 return;
               }
 
-              console.log(`current is ${componentName}`);
-
               // 找到 data-dora-id
               let doraId = "";
               if (openingElement.attributes.length > 0) {
