@@ -48,13 +48,21 @@ function componentSpecTree() {
               const componentName = openingElement.name.name;
               const lineNumber = openingElement.loc?.start.line || "unknown";
 
+              if (
+                componentName.startsWith("Route") ||
+                componentName === "BrowserRouter"
+              ) {
+                return;
+              }
+
               console.log(`current is ${componentName}`);
 
               // 找到 data-dora-id
               let doraId = "";
               if (openingElement.attributes.length > 0) {
                 const attr = openingElement.attributes.find(
-                  (attr) => attr.name.name === "data-dora-id"
+                  (attr) =>
+                    attr && attr.name && attr.name.name === "data-dora-id"
                 );
                 if (attr) {
                   doraId = attr.value.value;

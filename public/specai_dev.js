@@ -1,3 +1,7 @@
+const style = document.createElement("style");
+style.innerText = "specai-tag-start, specai-tag-end {display: none;}";
+document.body.appendChild(style);
+
 const sendMessageToParent = (type, data) => {
   if (window.parent) {
     window.parent.postMessage({ type, data }, "*");
@@ -98,9 +102,14 @@ const initDomObserver = () => {
     let rootElement = document.getElementById("root");
     if (!rootElement) return;
 
-    const domStructure = getDomInfo(rootElement);
-    sendMessageToParent("DOM_STRUCTURE", domStructure);
-    console.log(domStructure);
+    if (
+      window.location.href.includes("specai-page") ||
+      window.location.href.includes("specai-component")
+    ) {
+      const domStructure = getDomInfo(rootElement);
+      sendMessageToParent("DOM_STRUCTURE", domStructure);
+      console.log(domStructure);
+    }
   }, 100);
 };
 
