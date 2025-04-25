@@ -20,7 +20,6 @@ export default function ButtonShowcase() {
               <Button
                 variant={variant}
                 size={size}
-                hovered
                 data-component-root={`${variant} · ${size} · hovered`}
               >
                 Button
