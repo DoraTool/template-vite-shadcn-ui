@@ -8,23 +8,14 @@ const sendMessageToParent = (type, data) => {
   }
 };
 
-const handleError = () => {
-  window.addEventListener("error", (event) => {
-    sendMessageToParent("ERROR", {
-      message: event.message,
-      stack: event.error.stack.toString(),
-      error: event.error?.toString(),
-    });
-  });
-};
-
-// parent and self dora-id
+// Get all parent dora-ids
 const getAllDoraIds = (element) => {
   const allDoraIds = [];
   let prevSibling = element.previousElementSibling;
+
   while (prevSibling) {
     if (prevSibling.tagName.toLowerCase() === "specai-tag-start") {
-      const doraId = prevSibling.getAttribute("data-dora-id");
+      const doraId = prevSibling.getAttribute("data-spec-id");
       if (doraId) {
         allDoraIds.unshift(doraId);
       }
@@ -34,7 +25,7 @@ const getAllDoraIds = (element) => {
     prevSibling = prevSibling.previousElementSibling;
   }
 
-  const doraId = element.getAttribute("data-dora-id");
+  const doraId = element.getAttribute("data-spec-id");
   if (doraId) {
     allDoraIds.push(doraId);
   }
@@ -53,43 +44,26 @@ const getDomInfo = (element) => {
     height: rect.height,
   };
 
-  const processTextNode = (node, parentRect) => ({
-    nodeType: "text",
-    text: node.textContent.trim(),
-    doraId: node.parentElement?.getAttribute("data-dora-id") || "",
-    allDoraIds: getAllDoraIds(node.parentElement),
-    position,
-    size,
-  });
-
-  const children = Array.from(element.childNodes)
-    .map((node) => {
-      const tagName = node.tagName?.toLowerCase();
-      if (tagName === "specai-tag-start" || tagName === "specai-tag-end") {
-        return null;
-      }
-      if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-        return processTextNode(node, rect);
-      }
-      if (node.nodeType === Node.ELEMENT_NODE) {
-        return getDomInfo(node);
-      }
-      return null;
+  const children = Array.from(element.children)
+    .filter((node) => {
+      const tagName = node.tagName.toLowerCase();
+      return tagName !== "specai-tag-start" && tagName !== "specai-tag-end";
     })
-    .filter(Boolean);
+    .map((node) => getDomInfo(node));
+
+  const ids = getAllDoraIds(element);
 
   const res = {
     nodeType: "element",
     tagName: element.tagName.toLowerCase(),
     componentName: element.tagName,
-    doraId: element.getAttribute("data-dora-id") || "",
-    allDoraIds: getAllDoraIds(element),
+    id: ids[0] || "",
+    allIds: ids,
     position,
     size,
     children,
   };
 
-  // component container size
   if (element.hasAttribute("data-component-container")) {
     res["componentContainerWidth"] = element.scrollWidth + 160;
   }
@@ -97,23 +71,54 @@ const getDomInfo = (element) => {
   return res;
 };
 
-const initDomObserver = () => {
-  setTimeout(() => {
-    let rootElement = document.getElementById("root");
-    if (!rootElement) return;
+const sendDomStructure = () => {
+  const rootElement = document.getElementById("root");
+  if (rootElement) {
+    const domStructure = getDomInfo(rootElement);
 
-    if (
-      window.location.href.includes("specai-page") ||
-      window.location.href.includes("specai-component")
-    ) {
-      const domStructure = getDomInfo(rootElement);
-      sendMessageToParent("DOM_STRUCTURE", domStructure);
-      console.log(domStructure);
+    if (!domStructure.size.width && !domStructure.size.height) {
+      return;
     }
-  }, 100);
+
+    const viewportSize = {
+      width: Math.max(
+        document.documentElement.clientWidth,
+        document.documentElement.scrollWidth,
+        document.documentElement.offsetWidth
+      ),
+      height: Math.max(
+        document.documentElement.clientHeight,
+        document.documentElement.scrollHeight,
+        document.documentElement.offsetHeight,
+        1280
+      ),
+    };
+
+    sendMessageToParent("DOM_STRUCTURE", {
+      structure: domStructure,
+      viewport: viewportSize,
+    });
+
+    return domStructure;
+  }
 };
 
-window.addEventListener("load", () => {
-  handleError();
-  initDomObserver();
+// Handle viewport commands
+window.addEventListener("message", (event) => {
+  if (event.data.type === "REQUEST_DOM_STRUCTURE") {
+    const struct = sendDomStructure();
+  }
 });
+
+// Initialize
+function onLoad(ms) {
+  setTimeout(() => {
+    const struct = sendDomStructure();
+
+    if (!struct || !struct.children.length) {
+      onLoad(2000);
+    }
+  }, ms);
+}
+
+onLoad(500);

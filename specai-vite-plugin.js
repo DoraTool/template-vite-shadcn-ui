@@ -55,12 +55,12 @@ function componentSpecTree() {
                 return;
               }
 
-              // 找到 data-dora-id
+              // 找到 data-spec-id
               let doraId = "";
               if (openingElement.attributes.length > 0) {
                 const attr = openingElement.attributes.find(
                   (attr) =>
-                    attr && attr.name && attr.name.name === "data-dora-id"
+                    attr && attr.name && attr.name.name === "data-spec-id"
                 );
                 if (attr) {
                   doraId = attr.value.value;
@@ -81,7 +81,7 @@ function componentSpecTree() {
                       t.stringLiteral(componentName)
                     ),
                     t.jsxAttribute(
-                      t.jsxIdentifier("data-dora-id"),
+                      t.jsxIdentifier("data-spec-id"),
                       t.stringLiteral(String(doraId))
                     ),
                   ],
@@ -102,7 +102,7 @@ function componentSpecTree() {
                       t.stringLiteral(componentName)
                     ),
                     t.jsxAttribute(
-                      t.jsxIdentifier("data-dora-id"),
+                      t.jsxIdentifier("data-spec-id"),
                       t.stringLiteral(String(doraId))
                     ),
                   ],
@@ -134,7 +134,7 @@ function componentSpecTree() {
         // 3. 生成修改后的代码
         return generate(ast).code;
       } catch (error) {
-        console.error(`Error processing file ${id}:`, error);
+        console.error("Error processing file " + id + ":", error);
         stats.processedFiles++;
         return null;
       }
