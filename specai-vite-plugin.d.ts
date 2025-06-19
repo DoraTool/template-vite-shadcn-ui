@@ -1,3 +1,3 @@
 declare module "specai-vite-plugin.js" {
-  export const componentSpecTree: any;
+  export const componentSpecTree: any
 }

@@ -1,7 +1,14 @@
-import { Button } from '@/components/ui/button'
+import { Button } from "@/components/ui/button"
 
-const variants = ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'] as const
-const sizes = ['default', 'sm', 'lg', 'icon'] as const
+const variants = [
+  "default",
+  "destructive",
+  "outline",
+  "secondary",
+  "ghost",
+  "link",
+] as const
+const sizes = ["default", "sm", "lg", "icon"] as const
 
 export default function ButtonShowcase() {
   return (
@@ -25,7 +32,7 @@ export default function ButtonShowcase() {
                 Button
               </Button>
             </div>
-          )),
+          ))
         )}
       </div>
     </div>

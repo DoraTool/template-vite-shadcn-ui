@@ -5,7 +5,7 @@ const Index = () => {
         Start prompting me to build your web app
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index
